@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Chessboard</title>
+    <link rel="stylesheet" href="/css/chessboard-0.3.0.min.css">
+    <link rel="stylesheet" href="/css/bootstrap.css">
+    <style>
+      .container {
+        width: 95%;
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+      #board2 {
+        width: 100%;
+        max-width: 600px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="col-md-9 col-xs-12">
+        <div id="board2"></div>
+      </div>
+      <div class="col-md-3 col-xs-12">
+        <div style="margin-top: 25px">
+          <code class="code">
+            method: post <br>
+            path: / <br>
+            body: fen string or position object
+          </code>
+          <hr class="hr">
+          <code class="code">
+            method: post <br>
+            path: /move <br>
+            body: move string | position object (json)
+          </code>
+          <hr class="hr">
+          <code class="code">
+            method: post <br>
+            path: /start
+          </code>
+          <hr class="hr">
+          <code class="code">
+            method: post <br>
+            path: /clear
+          </code>
+          <hr>
+          <blockquote>
+            <b>Note:</b> use application/json to send object
+          </blockquote>
+          <p>
+            <a href="http://chessboardjs.com/docs#methods" target="docs">Docs here</a>
+          </p>
+          <hr class="hr">
+        </div>
+        <div class="buttons">
+          <input type="button" id="startBtn" value="Start" class="btn btn-primary"/>
+          <input type="button" id="clearBtn" value="Clear" class="btn btn-warning" />
+        </div>
+      </div>
+    </div>
+
+  <script src="/js/jquery.js"></script>
+  <script src="/js/chessboard-0.3.0.min.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+  const socket = io('');
+  var board = ChessBoard('board2', {
+      draggable: true,
+      dropOffBoard: 'trash',
+      sparePieces: true,
+      position: 'start'
+  });
+
+  $('#startBtn').on('click', board.start);
+  $('#clearBtn').on('click', board.clear);
+
+  socket.on('start', board.start);
+  socket.on('clear', board.clear);
+  socket.on('move', val => {
+    if(!val) {
+      return alert('Not a valid move');
+    }
+    board.move(val);
+  });
+  socket.on('position', pos => {
+    if(!pos) {
+      return alert('Not a valid position');
+    }
+    board.position(pos, true);
+  });
+  </script>
+  </body>
+</html>
